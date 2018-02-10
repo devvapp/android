@@ -6,7 +6,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,12 +20,15 @@ import java.net.URL;
 public class MainActivity extends AppCompatActivity {
 
     //Create EditText variable to refer the search edit text
-    EditText mSearchBoxEditText;
+    private EditText mSearchBoxEditText;
 
-    TextView mUrlDisplayTextView;
+    private TextView mUrlDisplayTextView;
 
+    private TextView mSearchResultsTextView;
 
-    TextView mSearchResults;
+    private TextView mErrorMessageTextView;
+
+    private ProgressBar mLoadingIndicator;
 
 
     @Override
@@ -32,7 +37,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mSearchBoxEditText = findViewById(R.id.et_search_box);
         mUrlDisplayTextView = findViewById(R.id.tv_url_display);
-        mSearchResults = findViewById(R.id.tv_github_search_results_json);
+        mSearchResultsTextView = findViewById(R.id.tv_github_search_results_json);
+        mErrorMessageTextView = findViewById(R.id.tv_error_message_display);
+        mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
     }
 
     @Override
@@ -68,6 +75,13 @@ public class MainActivity extends AppCompatActivity {
      * Make aynchronous call to get the data from github
      */
     public class GithubQueryTask extends AsyncTask<URL, Void, String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mLoadingIndicator.setVisibility(View.VISIBLE);
+        }
+
         @Override
         protected String doInBackground(URL... urls) {
 
@@ -85,9 +99,23 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String s) {
-            if(s != null && !s.equals("")){
-                mSearchResults.setText(s);
+            mLoadingIndicator.setVisibility(View.INVISIBLE);
+            if (s != null && !s.equals("")) {
+                showJsonDataTextView();
+                mSearchResultsTextView.setText(s);
+            } else{
+                showErrorMessageTextView();
             }
         }
+    }
+
+    private void showJsonDataTextView() {
+        mErrorMessageTextView.setVisibility(View.INVISIBLE);
+        mSearchResultsTextView.setVisibility(View.VISIBLE);
+    }
+
+    private void showErrorMessageTextView() {
+        mErrorMessageTextView.setVisibility(View.VISIBLE);
+        mSearchResultsTextView.setVisibility(View.INVISIBLE);
     }
 }
