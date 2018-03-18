@@ -201,14 +201,20 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapter.F
             invalidateData();
             getSupportLoaderManager().restartLoader(FORECAST_LOADER_ID, null, this);
             return true;
-        }
-
-        if(id == R.id.action_map){
+        } else if(id == R.id.action_map){
             openLocationInMap();
             return true;
+        } else if(id == R.id.action_settings){
+            return openSettings();
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private boolean openSettings() {
+        Intent startSettingsActivity = new Intent(this, SettingsActivity.class);
+        startActivity(startSettingsActivity);
+        return true;
     }
 
     /**
@@ -287,6 +293,17 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapter.F
                     return null;
                 }
             }
+
+            /**
+             * Sends the result of the load to the registered listener.
+             *
+             * @param data The result of the load
+             */
+            public void deliverResult(String[] data) {
+                mWeatherData = data;
+                super.deliverResult(data);
+            }
+
         };
     }
 
